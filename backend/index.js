@@ -9,6 +9,11 @@ const app = express();
 const PORT = 8000;
 app.use(express.json());
 
+
+app.get('/',(req,res)=>{
+  res.status(200).send("health ok");
+})
+
 // openai
 
 app.post("/ask-ai", async (req, res) => {
@@ -35,7 +40,7 @@ app.post("/ask-ai", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: error.message || "Internan server error " });
+      .json({ message: error.message || "Internal server error " });
   }
 });
 
