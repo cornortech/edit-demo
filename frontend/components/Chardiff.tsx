@@ -1,6 +1,7 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { diffChars, Change } from "diff";
-
+import Tiptap from "./Tiptap";
+import { usePDF } from 'react-to-pdf';
 const Page = ({
   originals,
   corrected,
@@ -60,8 +61,10 @@ const Page = ({
 
 
  
+  
 
   return (
+   
     <div className="">
       {improved.length > 0 ? (
         improved.map((element: ReactElement, index: number) => (
@@ -72,7 +75,8 @@ const Page = ({
           <p>your corrected data will be here </p>
         </div>
       )}
-    </div>
+      </div>
+  
   );
 };
 

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { type Editor } from "@tiptap/react";
+import PDF from "./PDF";
 import {
   Bold,
   Strikethrough,
@@ -20,6 +21,7 @@ type Props = {
   editor: Editor | null;
   content: string;
   handleGrammerCheck: () => void;
+  
 };
 
 const Toolbar = ({ editor, content, handleGrammerCheck }: Props) => {
@@ -44,9 +46,7 @@ const Toolbar = ({ editor, content, handleGrammerCheck }: Props) => {
         <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
           Improve
         </button>
-        <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
-          PDF
-        </button>
+        
         {/* <button
           onClick={(e) => {
             e.preventDefault();
