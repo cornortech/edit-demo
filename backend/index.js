@@ -10,7 +10,8 @@ const PORT = 8000;
 app.use(express.json());
 
 // openai
-app.get("/ask-ai", async (req, res) => {
+
+app.post("/ask-ai", async (req, res) => {
   const { prompt } = req.body;
   try {
     const completion = await openai.chat.completions.create({
@@ -30,7 +31,7 @@ app.get("/ask-ai", async (req, res) => {
 
     console.log(completion);
 
-    res.status(200).json({ message: completion.choices[0] });
+    res.status(200).json({ message: completion.choices[0]?.message?.content });
   } catch (error) {
     res
       .status(500)
