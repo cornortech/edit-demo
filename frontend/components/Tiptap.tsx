@@ -5,10 +5,23 @@ import StarterKit from "@tiptap/starter-kit";
 import Toolbar from "./Toolbar";
 import Underline from "@tiptap/extension-underline";
 
-const Tiptap = ({ onChange, content }: any) => {
+const Tiptap = ({ onChange, content, handleGrammerCheck }: any) => {
   const handleChange = (newContent: string) => {
-    onChange(newContent);
+    const filtered_data = removePTagsAndWhitespace(newContent);
+    onChange(filtered_data);
   };
+  function removePTagsAndWhitespace(inputString: string) {
+    // Remove both opening and closing <p> tags
+    let stringWithoutPTags = inputString.replace(/<\/?p[^>]*>/g, "");
+
+    // Remove extra whitespace
+    let stringWithoutWhitespace = stringWithoutPTags
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return stringWithoutWhitespace;
+  }
+
   const editor = useEditor({
     extensions: [StarterKit, Underline],
     editorProps: {
@@ -21,11 +34,15 @@ const Tiptap = ({ onChange, content }: any) => {
       handleChange(editor.getHTML());
     },
   });
-  
+
   return (
     <div className="w-full px-4">
-      <Toolbar editor={editor} content={content}/>
-      <EditorContent  style={{ whiteSpace: "pre-line" }} editor={editor} />
+      <Toolbar
+        editor={editor}
+        content={content}
+        handleGrammerCheck={handleGrammerCheck}
+      />
+      <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
     </div>
   );
 };

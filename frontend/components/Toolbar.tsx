@@ -18,10 +18,11 @@ import {
 
 type Props = {
   editor: Editor | null;
-  content: string ;
+  content: string;
+  handleGrammerCheck: () => void;
 };
 
-const Toolbar = ({ editor, content }: Props) => {
+const Toolbar = ({ editor, content, handleGrammerCheck }: Props) => {
   if (!editor) {
     return null;
   }
@@ -31,12 +32,22 @@ const Toolbar = ({ editor, content }: Props) => {
     gap-5 w-full flex-wrap border border-gray-400"
     >
       <div className="flex justify-center items-center gap-5 w-full  flex-wrap ">
-      
-         <button className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md" >Grammer</button> 
-         <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md" >Rewrite</button> 
-         <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md" >Improve</button>
-         <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md" >PDF</button>
         <button
+          className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+          onClick={handleGrammerCheck}
+        >
+          Grammer
+        </button>
+        <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
+          Rewrite
+        </button>
+        <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
+          Improve
+        </button>
+        <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
+          PDF
+        </button>
+        {/* <button
           onClick={(e) => {
             e.preventDefault();
             editor.chain().focus().toggleBold().run();
@@ -153,7 +164,7 @@ const Toolbar = ({ editor, content }: Props) => {
           }
         >
           <Code className="w-4 h-4"/>
-        </button>
+        </button> */}
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -178,11 +189,9 @@ const Toolbar = ({ editor, content }: Props) => {
               : "text-slate-800 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
           }
         >
-          <Redo className="w-4 h-4"/>
+          <Redo className="w-4 h-4" />
         </button>
-        
       </div>
-      
     </div>
   );
 };

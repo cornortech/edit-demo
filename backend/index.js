@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors"
+
 dotenv.config();
 
 
@@ -8,6 +10,9 @@ import openai from "./utils/openai.js";
 const app = express();
 const PORT = 8000;
 app.use(express.json());
+app.use(cors({
+  origin:"*"
+}))
 
 
 app.get('/',(req,res)=>{
