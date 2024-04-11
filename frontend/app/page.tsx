@@ -7,11 +7,13 @@ import Page from "@/components/Chardiff";
 import axios from "axios";
 import { usePDF } from "react-to-pdf";
 import PDF from "@/components/PDF";
+import Toolbar from "@/components/Toolbar";
+import Copy from '@/components/Copy';
 export default function Home() {
   const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
   const [prompt, setPrompt] = useState("");
   const [correctedGrammer, setCorrectedGrammer] = useState("")
-
+   
   const handleExportPdf = () => {
     toPDF()
   }
@@ -48,9 +50,15 @@ export default function Home() {
         />
 
         {/* <Notes /> */}
-        {/* <Page originals={prompt} corrected={correctedGrammer} /> */}
       </div>
+      <div className="hidden">
+
       <PDF originals={prompt} corrected={correctedGrammer} />
+      
+      </div>
+      <Copy corrected={correctedGrammer}  />
+        <Page originals={prompt} corrected={correctedGrammer} />
+      
     </div>
   );
 }
