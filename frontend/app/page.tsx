@@ -38,7 +38,7 @@ export default function Home() {
         {/* <Notes /> */}
         <Page originals={prompt} corrected={correctedGrammer}   />
       </div>
-      <PDF correctedGrammer={correctedGrammer} />
+      <PDF originals={prompt} corrected={correctedGrammer} />
     </div>
   );
 }
