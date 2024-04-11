@@ -18,7 +18,6 @@ const Todo = ({
     setPrompt(content);
   };
 
-  console.log(content);
 
   // const handleSubmit = (e: any) => {
   //   e.preventDefault()

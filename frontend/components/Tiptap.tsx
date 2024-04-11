@@ -45,6 +45,7 @@ const Tiptap = ({
     console.log(" this prompt",editor)
 
     
+    
   return (
     <div className="w-full px-4">
       <Toolbar

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { type Editor } from "@tiptap/react";
-import PDF from "./PDF";
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 import {
   // Bold,
   // Strikethrough,
@@ -16,6 +16,7 @@ import {
   Redo,
   // Code,
 } from "lucide-react";
+import usePdfStore from "@/app/store/usePdf";
 
 type Props = {
   editor: Editor | null;
@@ -30,6 +31,9 @@ const Toolbar = ({
   handleGrammerCheck,
   handleExportPdf,
 }: Props) => {
+  const pdfExportFunction = usePdfStore((state) => state.pdfExportFunction);
+  const correctedData = usePdfStore((state) => state.correctedData);
+
   if (!editor) {
     return null;
   }
@@ -53,9 +57,20 @@ const Toolbar = ({
         </button>
         <button
           className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md"
-          onClick={() => { handleExportPdf() }}>
+          onClick={() => {
+            pdfExportFunction && pdfExportFunction();
+          }}
+        >
           Export PDF
         </button>
+        <CopyToClipboard
+          text={correctedData}
+          // onCopy={}
+        >
+          <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
+            Copy to Clipboard
+          </button>
+        </CopyToClipboard>
 
         {/* <button
           onClick={(e) => {

@@ -20,8 +20,6 @@ const Page = ({
   const [improved,setImproved] =useState <ReactElement[]>([])
 
 
-
-
   const compareSentences = (
     original: string,
     corrected: string
