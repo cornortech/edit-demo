@@ -1,14 +1,16 @@
-'use client'
+"use client";
 
-import React, { Dispatch, SetStateAction, useState } from 'react'
-import Tiptap from './Tiptap'
+import React, { Dispatch, SetStateAction, useState } from "react";
+import Tiptap from "./Tiptap";
 
 const Todo = ({
   setPrompt,
   handleGrammerCheck,
+  handleExportPdf,
 }: {
   setPrompt: Dispatch<SetStateAction<string>>;
-    handleGrammerCheck: () => void;
+  handleGrammerCheck: () => void;
+  handleExportPdf: () => void;
 }) => {
   const [content, setContent] = useState<string>("");
   const handleContentChange = (reason: any) => {
@@ -17,7 +19,6 @@ const Todo = ({
   };
 
   console.log(content);
-
 
   // const handleSubmit = (e: any) => {
   //   e.preventDefault()
@@ -56,14 +57,13 @@ const Todo = ({
         <p className="mt-2"> select upto 3 categroies</p>
       </div>
       <Tiptap
+        handleExportPdf={handleExportPdf}
         content={content}
         handleGrammerCheck={handleGrammerCheck}
-
         onChange={(newContent: string) => handleContentChange(newContent)}
       />
-    
     </div>
   );
 };
 
-export default Todo
+export default Todo;

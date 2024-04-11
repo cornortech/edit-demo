@@ -5,7 +5,12 @@ import StarterKit from "@tiptap/starter-kit";
 import Toolbar from "./Toolbar";
 import Underline from "@tiptap/extension-underline";
 
-const Tiptap = ({ onChange, content, handleGrammerCheck }: any) => {
+const Tiptap = ({
+  onChange,
+  content,
+  handleGrammerCheck,
+  handleExportPdf,
+}: any) => {
   const handleChange = (newContent: string) => {
     const filtered_data = removePTagsAndWhitespace(newContent);
     onChange(filtered_data);
@@ -35,11 +40,17 @@ const Tiptap = ({ onChange, content, handleGrammerCheck }: any) => {
     },
   });
 
+
+
+    console.log(" this prompt",editor)
+
+    
   return (
     <div className="w-full px-4">
       <Toolbar
         editor={editor}
         content={content}
+        handleExportPdf={handleExportPdf}
         handleGrammerCheck={handleGrammerCheck}
       />
       <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />

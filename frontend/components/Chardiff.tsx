@@ -1,7 +1,13 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { diffChars, Change } from "diff";
-import Tiptap from "./Tiptap";
-import { usePDF } from 'react-to-pdf';
+
+
+// axios  
+// fetch
+
+
+
+
 const Page = ({
   originals,
   corrected,

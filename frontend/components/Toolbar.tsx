@@ -4,27 +4,32 @@ import React from "react";
 import { type Editor } from "@tiptap/react";
 import PDF from "./PDF";
 import {
-  Bold,
-  Strikethrough,
-  Italic,
-  List,
-  ListOrdered,
-  Heading2,
-  Underline,
-  Quote,
+  // Bold,
+  // Strikethrough,
+  // Italic,
+  // List,
+  // ListOrdered,
+  // Heading2,
+  // Underline,
+  // Quote,
   Undo,
   Redo,
-  Code,
+  // Code,
 } from "lucide-react";
 
 type Props = {
   editor: Editor | null;
   content: string;
   handleGrammerCheck: () => void;
-  
+  handleExportPdf: () => void;
 };
 
-const Toolbar = ({ editor, content, handleGrammerCheck }: Props) => {
+const Toolbar = ({
+  editor,
+  content,
+  handleGrammerCheck,
+  handleExportPdf,
+}: Props) => {
   if (!editor) {
     return null;
   }
@@ -46,7 +51,12 @@ const Toolbar = ({ editor, content, handleGrammerCheck }: Props) => {
         <button className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md">
           Improve
         </button>
-        
+        <button
+          className="bg-slate-100 border border-slate-500 p-1 text-sm  rounded-md"
+          onClick={() => { handleExportPdf() }}>
+          Export PDF
+        </button>
+
         {/* <button
           onClick={(e) => {
             e.preventDefault();
