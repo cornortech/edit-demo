@@ -61,6 +61,7 @@ const Todo = ({
 
         onChange={(newContent: string) => handleContentChange(newContent)}
       />
+    
     </div>
   );
 };
