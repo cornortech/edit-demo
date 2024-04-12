@@ -42,7 +42,7 @@ export default function Home() {
   
   return (
     <div className="bg-slate-100 w-full min-h-screen pb-10 flex flex-col items-center justify-center">
-      <div className="w-96 border-solid border border-slate-200 ">
+      <div className="w-11/12 border-solid border border-slate-200 ">
         <NotesPicker
           handleExportPdf={handleExportPdf}
           setPrompt={setPrompt}
@@ -51,12 +51,9 @@ export default function Home() {
 
         {/* <Notes /> */}
       </div>
-      <div className="hidden">
-
-      <PDF originals={prompt} corrected={correctedGrammer} />
       
-      </div>
       <Copy corrected={correctedGrammer}  />
+      <PDF originals={prompt} corrected={correctedGrammer} />
         <Page originals={prompt} corrected={correctedGrammer} />
       
     </div>
