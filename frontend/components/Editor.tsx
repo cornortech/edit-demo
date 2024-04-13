@@ -13,6 +13,7 @@ import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import * as Icons from "./Icons";
 import { diffChars, Change } from "diff";
+import { usePDF } from 'react-to-pdf';
 import { Del, Ins } from "@/app/extension/Extension";
 // import PDF from "./PDF"
 import "../app/globals.css";
@@ -222,7 +223,7 @@ export function SimpleEditor() {
     navigator.clipboard.writeText(correctedText); // Copy corrected text to clipboard
     setCopied(true); // Set copied state to true
   };
-
+  const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});
   if (!editor) {
     return null;
   }
@@ -307,11 +308,19 @@ export function SimpleEditor() {
             Update
           </button>
         )}
+         <button
+          className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+          onClick={() => toPDF()}
+        >
+         PDF
+        </button>
       </div>
 
       {/* <Toolbar content={ correctedText} editor={editor} handleExportPdf={hand } /> */}
-      
-      <EditorContent editor={editor} />
+      <div ref={targetRef}>
+          
+      <EditorContent  className="h-40px" editor={editor} />
+         </div>
 
       {modalIsOpen && <Page inputText={inputText} corrected={correctedText} />}
     </div>
