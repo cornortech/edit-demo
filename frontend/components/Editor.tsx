@@ -13,10 +13,7 @@ import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import * as Icons from "./Icons";
 import { diffChars, Change } from "diff";
-import { Del, Ins } from "@/app/extension/Extension";
-// import PDF from "./PDF"
 import "../app/globals.css";
-import Toolbar from "./Toolbar";
 const Page = ({
   inputText,
   corrected,
@@ -171,7 +168,7 @@ export function SimpleEditor() {
       Code,
     ],
     content:
-      " <p> <del>hello how are you </del><u>i am inserted here </u> </p>",
+      " <p> <del>i</del><u>I</u> like to go <u>to </u>school<u>.</u> <del>w</del><u>W</u>hat about you<del> </p></del><u>?</u></p>",
   }) as Editor;
 
   const handleGrammerCheck = async () => {
@@ -194,7 +191,9 @@ export function SimpleEditor() {
   };
 
   const handleUpdate = () => {
-    editor.commands.setContent(getCorrectedContent(inputText,correctedText));
+    editor.commands.setContent(
+      `<p>${getCorrectedContent(inputText, correctedText)}</p>`
+    );
     setIsOpen(false);
   };
 
