@@ -8,6 +8,7 @@ type Props = {
 const Copy = (props: Props) => {
   const { corrected } = props;
   const [copied, setCopied] = useState(false);
+ 
 
   useEffect(() => {
     setCopied(false);
