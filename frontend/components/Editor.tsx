@@ -13,10 +13,10 @@ import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import * as Icons from "./Icons";
 import { diffChars, Change } from "diff";
-import { usePDF } from 'react-to-pdf';
-import { Del, Ins } from "@/app/extension/Extension";
 // import PDF from "./PDF"
 import "../app/globals.css";
+import usePdfStore from "@/app/store/usePdf";
+import { usePDF } from "react-to-pdf";
 const Page = ({
   inputText,
   corrected,
@@ -78,24 +78,37 @@ export function SimpleEditor() {
   const [copied, setCopied] = useState(false); // State to track if text is copied
   const [improved, setImproved] = useState<React.ReactNode[]>([]);
   const [final, setFinal] = useState("");
+  const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
+  const setStoredFunction = usePdfStore((state) => state.setPdfExportFunction);
+  const [isCheckingGrammer, setIsCheckingGrammer] = useState(false);
 
-  const getCorrectedContent = (original:string, corrected:string) => {
+  useEffect(() => {
+    setStoredFunction(toPDF);
+  }, []);
+
+  const getCorrectedContent = (original: string, corrected: string) => {
     const diff: Change[] = diffChars(original, corrected);
-    let text = ""
-    diff.forEach(node => {
+    let text = "";
+    diff.forEach((node) => {
       if (node.added) {
-        console.log("added")
-        text+=`<u>${node.value}</u>`
+        console.log("added");
+        text += `<u>${node.value}</u>`;
       } else if (node.removed) {
         console.log("removed");
         text += `<del>${node.value}</del>`;
       } else {
-        text+=node.value
+        text += node.value;
       }
-    })
-    console.log(text)
-    return text;
-  }
+    });
+
+    let stringWithoutPTags = text.replace(/<p><\/p>/g, "");
+
+    console.log(stringWithoutPTags);
+
+    console.log("the text", stringWithoutPTags);
+
+    return stringWithoutPTags;
+  };
 
   const compareSentences = (
     original: string,
@@ -103,56 +116,47 @@ export function SimpleEditor() {
   ): React.ReactNode[] => {
     const diff: Change[] = diffChars(original, corrected);
 
-    console.log("the diff", diff);
-
     const result: React.ReactNode[] = [];
 
     diff.forEach((part: Change, index: number) => {
       let style: React.CSSProperties = {};
 
-       if (part.added) {
-         style = {
-           color: "green",
-           backgroundColor: "lightgreen",
-           textDecoration: "none",
-         };
-       } else if (part.removed) {
-         style = {
-           color: "red",
-           backgroundColor: "lightcoral",
-           textDecoration: "line-through",
-         };
-       } else {
-         style = {
-           color: "black",
-           backgroundColor: "transparent",
-           textDecoration: "none",
-         };
-       }
-
       if (part.added) {
-        return result.push(
-          <ins key={index} style={style}>
-            {part.value}
-          </ins>
-        );
+        style = {
+          color: "green",
+          backgroundColor: "lightgreen",
+          textDecoration: "underline",
+          height: "40px",
+        };
       } else if (part.removed) {
-        return result.push(
-          <del key={index} style={style}>
-            {part.value}
-          </del>
-        );
+        style = {
+          color: "red",
+          backgroundColor: "lightcoral",
+          //  textDecoration: "line-through",
+          height: "40px",
+        };
       } else {
-        result.push(
-          <span key={index} style={style}>
-            {part.value}
-          </span>
-        );
+        style = {
+          color: "black",
+          backgroundColor: "transparent",
+          textDecoration: "none",
+          height: "40px",
+        };
       }
+
+      result.push(
+        <div key={index} style={style}>
+          {part.value}
+        </div>
+      );
     });
 
     return result;
   };
+
+  useEffect(() => {
+    handleUpdate();
+  }, [correctedText]);
 
   useEffect(() => {
     setImproved(compareSentences(inputText, correctedText));
@@ -170,12 +174,19 @@ export function SimpleEditor() {
       Strike,
       Code,
     ],
-    content:
-      " <p> <del>i</del><u>I</u> like to go <u>to </u>school<u>.</u> <del>w</del><u>W</u>hat about you<del> </p></del><u>?</u></p>",
+    content: "Write your story here",
   }) as Editor;
+
+  const handleExport = () => {
+    toPDF();
+  };
 
   const handleGrammerCheck = async () => {
     try {
+      if (isCheckingGrammer) {
+        alert("please accept or reject the current gpt solution ");
+        return;
+      }
       const currentContent = editor.getHTML();
       const { data, status } = await axios.post(
         "http://localhost:8000/ask-ai",
@@ -187,17 +198,32 @@ export function SimpleEditor() {
         setCorrectedText(data.message); // Set corrected text
         setIsOpen(true);
         setCopied(false); // Reset copied state
+        setIsCheckingGrammer(true);
       }
     } catch (error) {
       console.log("error", error);
     }
   };
+  const handleAcceptAll = () => {
+    if (editor) {
+      editor.commands.setContent(`${correctedText}`);
+    }
+    setIsCheckingGrammer(false);
+  };
+  const handleReject = () => {
+    if (editor) {
+      editor.commands.setContent(`${inputText}`);
+    }
+    setIsCheckingGrammer(false);
+  };
 
   const handleUpdate = () => {
-    editor.commands.setContent(
-      `<p>${getCorrectedContent(inputText, correctedText)}</p>`
-    );
-    setIsOpen(false);
+    if (editor) {
+      editor.commands.setContent(
+        `${getCorrectedContent(inputText, correctedText)}`
+      );
+    }
+    // setIsOpen(false);
   };
 
   const toggleBold = useCallback(() => {
@@ -224,106 +250,131 @@ export function SimpleEditor() {
     navigator.clipboard.writeText(correctedText); // Copy corrected text to clipboard
     setCopied(true); // Set copied state to true
   };
-  const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});
   if (!editor) {
     return null;
   }
 
-  console.log(improved);
   return (
-    <div className="editor bg-white p-4 rounded shadow-md">
-      <div className="menu flex justify-center items-center gap-5 mb-4">
-        <div className="flex gap-3">
-          <button
-            className="menu-button mr-2 w-5 h-5 "
-            onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().undo()}
-          >
-            <Icons.RotateLeft />
-          </button>
-          <button
-            className="menu-button mr-2"
-            onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().redo()}
-          >
-            <Icons.RotateRight />
-          </button>
-          <button
-            className={classNames("menu-button mr-2", {
-              "is-active": editor.isActive("bold"),
-            })}
-            onClick={toggleBold}
-          >
-            <Icons.Bold />
-          </button>
-          <button
-            className={classNames("menu-button mr-2", {
-              "is-active": editor.isActive("underline"),
-            })}
-            onClick={toggleUnderline}
-          >
-            <Icons.Underline />
-          </button>
-          <button
-            className={classNames("menu-button mr-2", {
-              "is-active": editor.isActive("italic"),
-            })}
-            onClick={toggleItalic}
-          >
-            <Icons.Italic />
-          </button>
-          <button
-            className={classNames("menu-button mr-2", {
-              "is-active": editor.isActive("strike"),
-            })}
-            onClick={toggleStrike}
-          >
-            <Icons.Strikethrough />
-          </button>
-          <button
-            className={classNames("menu-button mr-2", {
-              "is-active": editor.isActive("code"),
-            })}
-            onClick={toggleCode}
-          >
-            <Icons.Code />
-          </button>
+    <>
+      <div className="editor bg-white p-4 rounded shadow-md w-full">
+        <div className="menu flex justify-center items-center gap-5 mb-4 flex-col">
+          <div className="flex gap-3 ">
+            <button
+              className="menu-button mr-2 w-5 h-5 "
+              onClick={() => editor.chain().focus().undo().run()}
+              disabled={!editor.can().undo()}
+            >
+              <Icons.RotateLeft />
+            </button>
+            <button
+              className="menu-button mr-2"
+              onClick={() => editor.chain().focus().redo().run()}
+              disabled={!editor.can().redo()}
+            >
+              <Icons.RotateRight />
+            </button>
+            <button
+              className={classNames("menu-button mr-2", {
+                "is-active": editor.isActive("bold"),
+              })}
+              onClick={toggleBold}
+            >
+              <Icons.Bold />
+            </button>
+            <button
+              className={classNames("menu-button mr-2", {
+                "is-active": editor.isActive("underline"),
+              })}
+              onClick={toggleUnderline}
+            >
+              <Icons.Underline />
+            </button>
+            <button
+              className={classNames("menu-button mr-2", {
+                "is-active": editor.isActive("italic"),
+              })}
+              onClick={toggleItalic}
+            >
+              <Icons.Italic />
+            </button>
+            <button
+              className={classNames("menu-button mr-2", {
+                "is-active": editor.isActive("strike"),
+              })}
+              onClick={toggleStrike}
+            >
+              <Icons.Strikethrough />
+            </button>
+            <button
+              className={classNames("menu-button mr-2", {
+                "is-active": editor.isActive("code"),
+              })}
+              onClick={toggleCode}
+            >
+              <Icons.Code />
+            </button>
+            <button
+              className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+              onClick={handleGrammerCheck}
+              disabled={isCheckingGrammer}
+            >
+              Grammar
+            </button>
+            {isCheckingGrammer && (
+              <>
+                <button
+                  className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+                  onClick={handleAcceptAll}
+                >
+                  Accept All
+                </button>
+                <button
+                  className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+                  onClick={handleReject}
+                >
+                  Reject All
+                </button>
+              </>
+            )}
+
+            <button
+              className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+              onClick={handleCopy}
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+            <button
+              className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+              onClick={handleExport}
+            >
+              Export pdf
+            </button>
+          </div>
         </div>
-        <button
-          className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-          onClick={handleGrammerCheck}
-        >
-          Grammar
-        </button>
-        <button
-          className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-          onClick={handleCopy}
-        >
-          {copied ? "Copied" : "Copy"}
-        </button>
-        {modalIsOpen && (
-          <button
-            className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-            onClick={handleUpdate}
-          >
-            Update
-          </button>
-        )}
-         <button
-          className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-          onClick={() => toPDF()}
-        >
-         PDF
-        </button>
+
+        <EditorContent editor={editor} />
       </div>
 
-      {/* <Toolbar content={ correctedText} editor={editor} handleExportPdf={hand } /> */}
-      <div ref={targetRef}>
-          
-      <EditorContent className="outline-0 outline-transparent border focus:outline-none focus:shadow-outline border-slate-200 rounded shadow appearance-none  w-full py-2 px-3 m-4 text-gray-700 leading-tight "  editor={editor} />
-         </div>
-
-      {modalIsOpen && <Page inputText={inputText} corrected={correctedText} />}
-    </div>
+      <div
+        className="flex items-center   h-[100vh] flex-col w-full relative z-[-10]  "
+        ref={targetRef}
+      >
+        <div className="w-11/12 ">
+          <div className="text flex text-[17px]">
+            {isCheckingGrammer ? (
+              improved.length > 0 ? (
+                improved.map((element) => <>{element}</>)
+              ) : (
+                <div className="p-2">
+                  <p>your corrected data will be here </p>
+                </div>
+              )
+            ) : (
+              correctedText
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

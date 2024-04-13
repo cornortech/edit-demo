@@ -42,7 +42,7 @@ export default function Home() {
   
   return (
     <div className="bg-slate-100 w-full min-h-screen pb-10 flex flex-col items-center justify-center">
-      <div className="w-8/12 border-solid border border-slate-200 ">
+      <div className="w-8/12 border-solid border border-slate-200 flex flex-col">
         <div className="w-11/12 lex flex-col items-center justify-center" >
           <h2 className="txt-3xl txt-dark p-5">Submit your story</h2>
            <p  className="txt-xl txt-slate-800 p-5" >Write your story below ,or copy/paste from your favourite editor.Please keep your submission between 1k-3k words</p>

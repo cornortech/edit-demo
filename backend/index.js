@@ -29,11 +29,11 @@ app.post("/ask-ai", async (req, res) => {
         {
           role: "system",
           content:
-            "You are a master proofreader. Only proofread the given text, don't add new text to the document. The instructions are often in English, but keep the proofread text in the same language as the language being asked to proofread.",
+            "You are a master proofreader. Only proofread the given text, don't add new text to the document. The instructions are often in English, but keep prompt in the same language as the language being asked to proofread.",
         },
         {
           role: "user",
-          content: `Proofread this but only fix grammar: ${prompt}`,
+          content: `Proofread this but only fix grammar : ${prompt}`,
         },
       ],
       model: "gpt-3.5-turbo",
