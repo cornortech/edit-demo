@@ -13,21 +13,12 @@ import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import * as Icons from "./Icons";
 import { diffChars, Change } from "diff";
-// import PDF from "./PDF"
+import {usePDF}  from 'react-to-pdf';
 
-const Page = ({
-  inputText,
-  corrected,
-}: {
-  inputText: string;
-  corrected: string;
-}) => {
+const Page: React.FC<{ inputText: string; corrected: string; }> = ({ inputText, corrected }) => {
   const [improved, setImproved] = useState<React.ReactNode[]>([]);
 
-  const compareSentences = (
-    original: string,
-    corrected: string
-  ): React.ReactNode[] => {
+  const compareSentences = (original: string, corrected: string): React.ReactNode[] => {
     const diff: Change[] = diffChars(original, corrected);
     const result: React.ReactNode[] = [];
 
@@ -69,11 +60,11 @@ const Page = ({
   return <div className="mt-4">{improved}</div>;
 };
 
-export function SimpleEditor() {
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [inputText, setInputText] = useState(""); // State to hold input text
-  const [correctedText, setCorrectedText] = useState("");
-  const [copied, setCopied] = useState(false); // State to track if text is copied
+export const SimpleEditor: React.FC = () => {
+  const [modalIsOpen, setIsOpen] = useState<boolean>(false);
+  const [inputText, setInputText] = useState<string>(""); // State to hold input text
+  const [correctedText, setCorrectedText] = useState<string>("");
+  const [copied, setCopied] = useState<boolean>(false); // State to track if text is copied
   const editor = useEditor({
     extensions: [
       Document,
@@ -89,9 +80,9 @@ export function SimpleEditor() {
     content: "<p>Your initial content here</p>",
   }) as Editor;
 
-  const handleGrammerCheck = async () => {
+  const handleGrammarCheck = async () => {
     try {
-      const currentContent = editor.getHTML();
+      const currentContent: string = editor.getHTML();
       const { data, status } = await axios.post(
         "http://localhost:8000/ask-ai",
         { prompt: currentContent }
@@ -138,10 +129,10 @@ export function SimpleEditor() {
     setCopied(true); // Set copied state to true
   };
 
+  const { toPDF, targetRef } = usePDF({ filename: 'page.pdf' });
   if (!editor) {
     return null;
   }
-
   return (
     <div className="editor bg-white p-4 rounded shadow-md">
       <div className="menu flex justify-center items-center gap-5 mb-4">
@@ -203,7 +194,7 @@ export function SimpleEditor() {
         </div>
         <button
           className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-          onClick={handleGrammerCheck}
+          onClick={handleGrammarCheck}
         >
           Grammar
         </button>
@@ -221,13 +212,19 @@ export function SimpleEditor() {
             Update
           </button>
         )}
+        <button
+          className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+          onClick={() => toPDF()}
+        >
+          PDF
+        </button>
       </div>
-
-      <EditorContent editor={editor} />
-
+      <div ref={targetRef}>
+        <EditorContent editor={editor} />
+      </div>
       {modalIsOpen && (
         <Page inputText={inputText} corrected={correctedText} />
       )}
     </div>
   );
-}
+};
