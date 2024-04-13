@@ -3,6 +3,8 @@ import { usePDF } from "react-to-pdf";
 import { Change, diffChars } from "diff";
 import usePdfStore from "@/app/store/usePdf";
 
+
+
 type Props = {
   originals: string;
   corrected: string;
@@ -16,7 +18,9 @@ const PDF: React.FC<Props> = ({ originals, corrected }) => {
 
   useEffect(() => {
     setStoredFunction(toPDF);
-  },[]);
+  }, []);
+  
+  
   
 
 
