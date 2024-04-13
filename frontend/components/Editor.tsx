@@ -17,7 +17,6 @@ import { usePDF } from 'react-to-pdf';
 import { Del, Ins } from "@/app/extension/Extension";
 // import PDF from "./PDF"
 import "../app/globals.css";
-import Toolbar from "./Toolbar";
 const Page = ({
   inputText,
   corrected,
@@ -172,7 +171,7 @@ export function SimpleEditor() {
       Code,
     ],
     content:
-      " <p> <del>hello how are you </del><u>i am inserted here </u> </p>",
+      " <p> <del>i</del><u>I</u> like to go <u>to </u>school<u>.</u> <del>w</del><u>W</u>hat about you<del> </p></del><u>?</u></p>",
   }) as Editor;
 
   const handleGrammerCheck = async () => {
@@ -195,7 +194,9 @@ export function SimpleEditor() {
   };
 
   const handleUpdate = () => {
-    editor.commands.setContent(getCorrectedContent(inputText,correctedText));
+    editor.commands.setContent(
+      `<p>${getCorrectedContent(inputText, correctedText)}</p>`
+    );
     setIsOpen(false);
   };
 
@@ -232,7 +233,7 @@ export function SimpleEditor() {
   return (
     <div className="editor bg-white p-4 rounded shadow-md">
       <div className="menu flex justify-center items-center gap-5 mb-4">
-        <div className="flex">
+        <div className="flex gap-3">
           <button
             className="menu-button mr-2 w-5 h-5 "
             onClick={() => editor.chain().focus().undo().run()}
@@ -319,7 +320,7 @@ export function SimpleEditor() {
       {/* <Toolbar content={ correctedText} editor={editor} handleExportPdf={hand } /> */}
       <div ref={targetRef}>
           
-      <EditorContent  className="h-40px" editor={editor} />
+      <EditorContent className="outline-0 outline-transparent border focus:outline-none focus:shadow-outline border-slate-200 rounded shadow appearance-none  w-full py-2 px-3 m-4 text-gray-700 leading-tight "  editor={editor} />
          </div>
 
       {modalIsOpen && <Page inputText={inputText} corrected={correctedText} />}
