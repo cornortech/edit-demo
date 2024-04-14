@@ -87,6 +87,7 @@ export function SimpleEditor() {
   }, []);
 
   const getCorrectedContent = (original: string, corrected: string) => {
+    original = original.replace(/<\/?p>/g, '');
     const diff: Change[] = diffChars(original, corrected);
     let text = "";
     diff.forEach((node) => {
