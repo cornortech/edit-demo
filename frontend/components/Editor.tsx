@@ -30,6 +30,11 @@ const Page = ({
     original: string,
     corrected: string
   ): React.ReactNode[] => {
+
+    original = original.replace(/<\/?p>/g, "");
+    corrected = corrected.replace(/<\/?p>/g, "");
+    console.log(original,corrected)
+
     const diff: Change[] = diffChars(original, corrected);
     const result: React.ReactNode[] = [];
 
@@ -104,9 +109,7 @@ export function SimpleEditor() {
 
     let stringWithoutPTags = text.replace(/<p><\/p>/g, "");
 
-    console.log(stringWithoutPTags);
 
-    console.log("the text", stringWithoutPTags);
 
     return stringWithoutPTags;
   };
@@ -115,7 +118,14 @@ export function SimpleEditor() {
     original: string,
     corrected: string
   ): React.ReactNode[] => {
+    original = original.replace(/<\/?p>/g, "");
+    corrected = corrected.replace(/<\/?p>/g, "");
+    console.log(original, corrected);
+
     const diff: Change[] = diffChars(original, corrected);
+    
+    //  corrected = corrected.replace(/<\/?p>/g, "");
+
 
     const result: React.ReactNode[] = [];
 
@@ -357,11 +367,11 @@ export function SimpleEditor() {
       </div>
 
       <div
-        className="flex items-center   h-[100vh] flex-col w-full relative z-[-10]  "
+        className="flex items-center   h-[100vh] flex-col w-full  "
         ref={targetRef}
       >
-        <div className="w-11/12 ">
-          <div className="text flex text-[17px]">
+        <div className="w-11/12 p-6">
+          <div className="text  text-[17px]">
             {isCheckingGrammer ? (
               improved.length > 0 ? (
                 improved.map((element) => <>{element}</>)
