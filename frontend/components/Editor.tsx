@@ -17,6 +17,7 @@ import { diffChars, Change } from "diff";
 import "../app/globals.css";
 import usePdfStore from "@/app/store/usePdf";
 import { usePDF } from "react-to-pdf";
+import PDF from "./PDF";
 const Page = ({
   inputText,
   corrected,
@@ -30,10 +31,9 @@ const Page = ({
     original: string,
     corrected: string
   ): React.ReactNode[] => {
-
     original = original.replace(/<\/?p>/g, "");
     corrected = corrected.replace(/<\/?p>/g, "");
-    console.log(original,corrected)
+    console.log(original, corrected);
 
     const diff: Change[] = diffChars(original, corrected);
     const result: React.ReactNode[] = [];
@@ -59,11 +59,18 @@ const Page = ({
           textDecoration: "none",
         };
       }
-      result.push(
-        <span key={index} style={style}>
+
+      const span: React.ReactElement = (
+        <div key={index} style={style}>
           {part.value}
-        </span>
+        </div>
       );
+      // result.push(
+      //   <span key={index} style={style}>
+      //     {part.value}
+      //   </span>
+      // );
+      result.push(span);
     });
 
     return result;
@@ -76,8 +83,32 @@ const Page = ({
   return <div className="mt-4">{improved}</div>;
 };
 
+type TWriteEasyFeature = "improve" | "grammer" | "rewrite";
+
+const AiFeatureTextMapping = {
+  improve: "Proofread this improving clarity and flow",
+  grammer: "Proofread this but only fix grammar",
+  rewrite: "Rewrite this improving clarity and flow",
+} as Record<TWriteEasyFeature, string>;
+
+const getAiPrompt = (type: TWriteEasyFeature, userInput: string) => {
+  let task = AiFeatureTextMapping[type];
+
+  const messages = [
+    {
+      role: "system",
+      content:
+        "You are a master proofreader. Only proofread the given text, don't add new text to the document. The instructions are often in English, but keep prompt in the same language as the language being asked to proofread.",
+    },
+    {
+      role: "user",
+      content: `${task} : ${userInput}`,
+    },
+  ];
+  return messages;
+};
+
 export function SimpleEditor() {
-  const [modalIsOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState(""); // State to hold input text
   const [correctedText, setCorrectedText] = useState("");
   const [copied, setCopied] = useState(false); // State to track if text is copied
@@ -87,12 +118,14 @@ export function SimpleEditor() {
   const setStoredFunction = usePdfStore((state) => state.setPdfExportFunction);
   const [isCheckingGrammer, setIsCheckingGrammer] = useState(false);
 
+  const pdfExportFunction = usePdfStore((state) => state.pdfExportFunction);
+
   useEffect(() => {
     setStoredFunction(toPDF);
   }, []);
 
   const getCorrectedContent = (original: string, corrected: string) => {
-    original = original.replace(/<\/?p>/g, '');
+    original = original.replace(/<\/?p>/g, "");
     const diff: Change[] = diffChars(original, corrected);
     let text = "";
     diff.forEach((node) => {
@@ -108,8 +141,7 @@ export function SimpleEditor() {
     });
 
     let stringWithoutPTags = text.replace(/<p><\/p>/g, "");
-
-
+    console.log(text);
 
     return stringWithoutPTags;
   };
@@ -123,9 +155,8 @@ export function SimpleEditor() {
     console.log(original, corrected);
 
     const diff: Change[] = diffChars(original, corrected);
-    
-    //  corrected = corrected.replace(/<\/?p>/g, "");
 
+    //  corrected = corrected.replace(/<\/?p>/g, "");
 
     const result: React.ReactNode[] = [];
 
@@ -185,29 +216,24 @@ export function SimpleEditor() {
       Strike,
       Code,
     ],
-    content: "Write your story here",
+    content:
+      "<p><del>h</del><u><p>H</u>ello<u>,</u> how are you<u>?</u> <del>i</del><u>I</u> am fine<del> </del><u>.</p></u></p>",
   }) as Editor;
 
   const handleExport = () => {
     toPDF();
   };
 
-  const handleGrammerCheck = async () => {
+  const handleClickFeature = async (type:TWriteEasyFeature) => {
     try {
-      if (isCheckingGrammer) {
-        alert("please accept or reject the current gpt solution ");
-        return;
-      }
       const currentContent = editor.getHTML();
       const { data, status } = await axios.post(
         "http://localhost:8000/ask-ai",
-        { prompt: currentContent }
+        { messages: getAiPrompt(type, currentContent) }
       );
-
       if (status === 200) {
         setInputText(currentContent); // Set input text
         setCorrectedText(data.message); // Set corrected text
-        setIsOpen(true);
         setCopied(false); // Reset copied state
         setIsCheckingGrammer(true);
       }
@@ -215,6 +241,7 @@ export function SimpleEditor() {
       console.log("error", error);
     }
   };
+
   const handleAcceptAll = () => {
     if (editor) {
       editor.commands.setContent(`${correctedText}`);
@@ -326,10 +353,24 @@ export function SimpleEditor() {
             </button>
             <button
               className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-              onClick={handleGrammerCheck}
+              onClick={() => handleClickFeature("grammer")}
               disabled={isCheckingGrammer}
             >
               Grammar
+            </button>
+            <button
+              className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+              onClick={() => handleClickFeature("improve")}
+              disabled={isCheckingGrammer}
+            >
+              Improve
+            </button>
+            <button
+              className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
+              onClick={() => handleClickFeature("rewrite")}
+              disabled={isCheckingGrammer}
+            >
+              Rewrite
             </button>
             {isCheckingGrammer && (
               <>
@@ -356,17 +397,21 @@ export function SimpleEditor() {
             </button>
             <button
               className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
-              onClick={handleExport}
+              onClick={() => {
+                pdfExportFunction && pdfExportFunction();
+              }}
             >
               Export pdf
             </button>
           </div>
         </div>
-
-        <EditorContent editor={editor} />
+        <div className="h-[500px]">
+          <EditorContent height={500} editor={editor} />
+        </div>
       </div>
 
-      <div
+      <PDF corrected={correctedText} originals={inputText} />
+      {/* <div
         className="flex items-center   h-[100vh] flex-col w-full  "
         ref={targetRef}
       >
@@ -385,7 +430,7 @@ export function SimpleEditor() {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

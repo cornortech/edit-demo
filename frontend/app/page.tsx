@@ -37,6 +37,8 @@ export default function Home() {
       console.log("error", error);
     }
   };
+
+  
    
 
   
@@ -46,8 +48,8 @@ export default function Home() {
         <div className="w-11/12 lex flex-col items-center justify-center" >
           <h2 className="txt-3xl txt-dark p-5">Submit your story</h2>
            <p  className="txt-xl txt-slate-800 p-5" >Write your story below ,or copy/paste from your favourite editor.Please keep your submission between 1k-3k words</p>
-           <h6 className="txt-3xl txt-slate-800 p-5">Submission Title</h6>
-           <input className="shadow appearance-none border rounded w-full py-2 px-3 m-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="title" type="text" placeholder="Enter title"></input>
+           {/* <h6 className="txt-3xl txt-slate-800 p-5">Submission Title</h6> */}
+           {/* <input className="shadow appearance-none border rounded w-full py-2 px-3 m-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="title" type="text" placeholder="Enter title"></input> */}
         </div>
 
        <SimpleEditor  />
@@ -80,3 +82,5 @@ export default function Home() {
   //      {/* <p>_____</p> */}
   //    </div>
   //  </div>;
+
+ 

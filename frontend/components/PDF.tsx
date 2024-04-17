@@ -3,8 +3,6 @@ import { usePDF } from "react-to-pdf";
 import { Change, diffChars } from "diff";
 import usePdfStore from "@/app/store/usePdf";
 
-
-
 type Props = {
   originals: string;
   corrected: string;
@@ -13,21 +11,19 @@ type Props = {
 const PDF: React.FC<Props> = ({ originals, corrected }) => {
   const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
   const [improved, setImproved] = useState<React.ReactElement[]>([]);
-  const setStoredFunction = usePdfStore((state) => state.setPdfExportFunction
-);
+  const setStoredFunction = usePdfStore((state) => state.setPdfExportFunction);
 
   useEffect(() => {
     setStoredFunction(toPDF);
   }, []);
-  
-  
-  
-
 
   const compareSentences = (
     original: string,
     corrected: string
   ): React.ReactElement[] => {
+    original = original.replace(/<\/?p>/g, "");
+    corrected = corrected.replace(/<\/?p>/g, "");
+
     const diff: Change[] = diffChars(original, corrected);
     const result: React.ReactElement[] = [];
 
@@ -67,13 +63,13 @@ const PDF: React.FC<Props> = ({ originals, corrected }) => {
   }, [corrected]);
 
   return (
-    <div className="w-full">
-      <button
+    <div className="w-full  relative  z-[-5] bg-black">
+      {/* <button
         className="bg-slate-100 border border-slate-500 p-1 text-sm rounded-md"
         onClick={() => toPDF()}
       >
         PDF
-      </button>
+      </button> */}
       <div
         className="flex items-center   h-[100vh] flex-col w-full "
         ref={targetRef}
